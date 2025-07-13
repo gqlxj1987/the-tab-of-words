@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Tab of Words - Japanese Vocabulary",
+  "version": "1.0.0",
+  "description": "Learn Japanese words in each new tab with JLPT vocabulary",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://jlpt-vocab-api.vercel.app/*",
+    "https://dict.youdao.com/*",
+    "https://jisho.org/*"
+  ],
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "background": {
+    "service_worker": "sw.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Tab of Words Settings",
+    "default_icon": {
+      "16": "favicon.svg",
+      "32": "favicon.svg",
+      "48": "favicon.svg",
+      "128": "favicon.svg"
+    }
+  },
+  "icons": {
+    "16": "favicon.svg",
+    "32": "favicon.svg",
+    "48": "favicon.svg",
+    "128": "favicon.svg"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

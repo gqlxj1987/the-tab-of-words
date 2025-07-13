@@ -9,7 +9,7 @@ import Settings from './components/settings'
 import WordCard from './components/word'
 import { viewAtom, wordsAtom } from './context/store'
 import { useFetchWordsWithCache } from './utils/api'
-import RegisterServiceWorkder from './sw/RegisterSW'
+import { migrateFromLocalStorage } from './utils/extension-storage'
 
 function MainView() {
   const [view] = useAtom(viewAtom)
@@ -37,6 +37,11 @@ function App() {
   const loading = !data && !error
 
   useEffect(() => {
+    // Migrate from localStorage to chrome.storage if needed
+    migrateFromLocalStorage()
+  }, [])
+
+  useEffect(() => {
     if (data) setWords(data)
   }, [data])
 
@@ -54,7 +59,7 @@ function App() {
           <br />
           Something wrong happened
           <br />
-          Try to fresh the page
+          Try to refresh the page
         </code>
       </FadeContainer>
     </>
@@ -63,7 +68,6 @@ function App() {
   return (
     <>
       {connected && app}
-      <RegisterServiceWorkder />
     </>
   )
 }

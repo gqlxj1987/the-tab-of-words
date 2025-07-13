@@ -2,6 +2,7 @@ import { atom } from 'jotai'
 import { focusAtom } from 'jotai/optics'
 import { atomWithStorage } from 'jotai/utils'
 import { Levels, Level, Id, Settings, View, Word } from '../types'
+import { learnedStorage, metStorage, settingsStorage } from '../utils/extension-storage-provider'
 
 const KEY = `tab-of-words`
 
@@ -18,14 +19,17 @@ const DEFAULT_SETTINGS: Settings = {
 }
 
 export const wordsAtom = atom<Word[]>([])
-export const learnedAtom = atomWithStorage<Id[]>(`${KEY}-learned`, [])
-export const metAtom = atomWithStorage<Id[]>(`${KEY}-met`, [])
+
+// Use Chrome extension storage instead of localStorage
+export const learnedAtom = atomWithStorage<Id[]>(`${KEY}-learned`, [], learnedStorage)
+export const metAtom = atomWithStorage<Id[]>(`${KEY}-met`, [], metStorage)
 
 export const randomWordAtom = atom<Word | null>(null)
 
 export const settingsAtom = atomWithStorage<Settings>(
   `${KEY}-settings`,
-  DEFAULT_SETTINGS
+  DEFAULT_SETTINGS,
+  settingsStorage
 )
 export const modeAtom = focusAtom(settingsAtom, (optic) => optic.prop('mode'))
 export const levelsAtom = focusAtom(settingsAtom, (optic) =>
