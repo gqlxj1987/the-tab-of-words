@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai'
-import { useEffect } from 'react'
+import { useEffect, Suspense, useState } from 'react'
 
 import { View } from './types'
 import Book from './components/book'
@@ -9,7 +9,7 @@ import Settings from './components/settings'
 import WordCard from './components/word'
 import { viewAtom, wordsAtom } from './context/store'
 import { useFetchWordsWithCache } from './utils/api'
-import { migrateFromLocalStorage } from './utils/extension-storage'
+import { migrateFromLocalStorage, ExtensionStorage, STORAGE_KEYS } from './utils/extension-storage'
 
 function MainView() {
   const [view] = useAtom(viewAtom)
@@ -33,17 +33,44 @@ function MainView() {
 
 function App() {
   const [, setWords] = useAtom(wordsAtom)
+  const [storageReady, setStorageReady] = useState(false)
   const { connected, data, error } = useFetchWordsWithCache()
   const loading = !data && !error
 
   useEffect(() => {
-    // Migrate from localStorage to chrome.storage if needed
-    migrateFromLocalStorage()
+    const initializeStorage = async () => {
+      try {
+        // Migrate from localStorage to chrome.storage if needed
+        await migrateFromLocalStorage()
+        
+        // Pre-load storage data to avoid async issues
+        await Promise.all([
+          ExtensionStorage.get(STORAGE_KEYS.LEARNED),
+          ExtensionStorage.get(STORAGE_KEYS.MET),
+          ExtensionStorage.get(STORAGE_KEYS.SETTINGS)
+        ])
+        
+        setStorageReady(true)
+      } catch (error) {
+        console.warn('Storage initialization error:', error)
+        setStorageReady(true) // Continue anyway
+      }
+    }
+
+    initializeStorage()
   }, [])
 
   useEffect(() => {
     if (data) setWords(data)
   }, [data])
+
+  if (!storageReady) {
+    return (
+      <div className="absolute-center">
+        <code className="text-stone-400">Initializing storage...</code>
+      </div>
+    )
+  }
 
   const app = (
     <>
@@ -66,9 +93,13 @@ function App() {
   )
 
   return (
-    <>
+    <Suspense fallback={
+      <div className="absolute-center">
+        <code className="text-stone-400">Loading...</code>
+      </div>
+    }>
       {connected && app}
-    </>
+    </Suspense>
   )
 }
 

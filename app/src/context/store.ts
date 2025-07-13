@@ -1,5 +1,5 @@
 import { atom } from 'jotai'
-import { focusAtom } from 'jotai/optics'
+import { focusAtom } from 'jotai-optics'
 import { atomWithStorage } from 'jotai/utils'
 import { Levels, Level, Id, Settings, View, Word } from '../types'
 import { learnedStorage, metStorage, settingsStorage } from '../utils/extension-storage-provider'
