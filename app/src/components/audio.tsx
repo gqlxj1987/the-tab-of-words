@@ -9,7 +9,11 @@ export default function Audio({ word }: { word: Word }) {
   const play = () => {
     if (audioRef.current) {
       audioRef.current.pause()
-      audioRef.current.play()
+      audioRef.current.play().catch((error) => {
+        if (error.name !== 'AbortError') {
+          console.error('Audio playback error:', error)
+        }
+      })
     }
   }
 

@@ -13,6 +13,7 @@ import { migrateFromLocalStorage, ExtensionStorage, STORAGE_KEYS } from './utils
 
 function MainView() {
   const [view] = useAtom(viewAtom)
+  
   const Views: Array<[key: View, el: () => JSX.Element]> = [
     ['word', WordCard],
     ['book', Book],

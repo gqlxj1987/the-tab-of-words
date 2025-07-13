@@ -11,7 +11,11 @@ export default function useAudio(content: string) {
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current.load()
-      audioRef.current.play()
+      audioRef.current.play().catch((error) => {
+        if (error.name !== 'AbortError') {
+          console.error('Audio playback error:', error)
+        }
+      })
     }
   }
 

@@ -100,10 +100,12 @@ export const getRandomWordAtom = atom(
   (get) => get(randomWordAtom),
   (get, set) => {
     const rest = get(restOfWordsAtom)
+    if (!rest || rest.length === 0) return
+    
     const randomWord = rest[Math.floor(Math.random() * rest.length)]
     set(randomWordAtom, randomWord)
 
-    if (get(modeAtom) === 'ichigoichie') {
+    if (randomWord && get(modeAtom) === 'ichigoichie') {
       set(metAtom, (prev) => [randomWord.uuid, ...prev])
     }
   }

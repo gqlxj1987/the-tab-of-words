@@ -8,6 +8,7 @@ body {
 
 #root {
   @apply h-full;
+  background: #F5F2EC;
 }
 
 @layer utilities {
@@ -18,4 +19,8 @@ body {
   .link {
     @apply text-stone-800 underline transition-colors;
   }
+}
+
+.japanese_gothic {
+  font-family: "Source Han Sans", "源ノ角ゴシック", "Hiragino Sans", "HiraKakuProN-W3", "Hiragino Kaku Gothic ProN W3", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3", "Noto Sans", "Noto Sans CJK JP", "メイリオ", Meiryo, "游ゴシック", YuGothic, "ＭＳ Ｐゴシック", "MS PGothic", "ＭＳ ゴシック", "MS Gothic", sans-serif
 }
