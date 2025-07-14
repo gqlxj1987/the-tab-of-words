@@ -7,7 +7,7 @@ import FadeContainer from './components/fade-container'
 import Header from './components/header'
 import Settings from './components/settings'
 import WordCard from './components/word'
-import { viewAtom, wordsAtom } from './context/store'
+import { viewAtom, wordsAtom, themeAtom } from './context/store'
 import { useFetchWordsWithCache } from './utils/api'
 import { migrateFromLocalStorage, ExtensionStorage, STORAGE_KEYS } from './utils/extension-storage'
 
@@ -34,6 +34,7 @@ function MainView() {
 
 function App() {
   const [, setWords] = useAtom(wordsAtom)
+  const [theme] = useAtom(themeAtom)
   const [storageReady, setStorageReady] = useState(false)
   const { connected, data, error } = useFetchWordsWithCache()
   const loading = !data && !error
@@ -45,11 +46,20 @@ function App() {
         await migrateFromLocalStorage()
         
         // Pre-load storage data to avoid async issues
-        await Promise.all([
+        const [, , settings] = await Promise.all([
           ExtensionStorage.get(STORAGE_KEYS.LEARNED),
           ExtensionStorage.get(STORAGE_KEYS.MET),
           ExtensionStorage.get(STORAGE_KEYS.SETTINGS)
         ])
+        
+        // Apply theme immediately if found in storage
+        if (settings?.theme) {
+          if (settings.theme === 'dark') {
+            document.documentElement.classList.add('dark')
+          } else {
+            document.documentElement.classList.remove('dark')
+          }
+        }
         
         setStorageReady(true)
       } catch (error) {
@@ -65,10 +75,19 @@ function App() {
     if (data) setWords(data)
   }, [data])
 
+  useEffect(() => {
+    // Apply theme class to document root
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [theme])
+
   if (!storageReady) {
     return (
       <div className="absolute-center">
-        <code className="text-stone-400">Initializing storage...</code>
+        <code className="text-stone-400 dark:text-stone-500">Initializing storage...</code>
       </div>
     )
   }
@@ -76,13 +95,13 @@ function App() {
   const app = (
     <>
       <FadeContainer show={loading}>
-        <code className="absolute-center text-stone-400">Initializing...</code>
+        <code className="absolute-center text-stone-400 dark:text-stone-500">Initializing...</code>
       </FadeContainer>
       <FadeContainer show={!!data}>
         <MainView />
       </FadeContainer>
       <FadeContainer show={!!error}>
-        <code className="text-base text-stone-400">
+        <code className="text-base text-stone-400 dark:text-stone-500">
           :(
           <br />
           Something wrong happened
@@ -96,7 +115,7 @@ function App() {
   return (
     <Suspense fallback={
       <div className="absolute-center">
-        <code className="text-stone-400">Loading...</code>
+        <code className="text-stone-400 dark:text-stone-500">Loading...</code>
       </div>
     }>
       {connected && app}

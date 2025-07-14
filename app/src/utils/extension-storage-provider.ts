@@ -7,21 +7,30 @@ import { ExtensionStorage, STORAGE_KEYS } from './extension-storage'
 export function createExtensionStorage<T>(storageKey: string, defaultValue: T) {
   let cachedValue: T = defaultValue
   let isInitialized = false
+  let initPromise: Promise<void> | null = null
 
   // Initialize cache from storage
   const initCache = async () => {
-    if (!isInitialized) {
-      try {
-        const value = await ExtensionStorage.get(storageKey)
-        if (value !== undefined) {
-          cachedValue = value
+    if (!isInitialized && !initPromise) {
+      initPromise = (async () => {
+        try {
+          const value = await ExtensionStorage.get(storageKey)
+          if (value !== undefined) {
+            cachedValue = value
+          }
+          isInitialized = true
+        } catch (error) {
+          console.warn(`Failed to initialize cache for ${storageKey}:`, error)
+          isInitialized = true
         }
-        isInitialized = true
-      } catch (error) {
-        console.warn(`Failed to initialize cache for ${storageKey}:`, error)
-        isInitialized = true
-      }
+      })()
+      await initPromise
     }
+  }
+
+  // Pre-initialize critical storage keys
+  if (storageKey === STORAGE_KEYS.SETTINGS) {
+    initCache()
   }
 
   return {
@@ -34,10 +43,12 @@ export function createExtensionStorage<T>(storageKey: string, defaultValue: T) {
     },
     setItem: (key: string, value: T): void => {
       cachedValue = value
+      isInitialized = true
       // Async save to storage (fire and forget)
-      ExtensionStorage.set(storageKey, value).catch(error => {
-        console.warn(`Failed to save ${storageKey} to storage:`, error)
-      })
+      ExtensionStorage.set(storageKey, value)
+        .catch(error => {
+          console.warn(`Failed to save ${storageKey} to storage:`, error)
+        })
     },
     removeItem: (key: string): void => {
       cachedValue = defaultValue
@@ -56,5 +67,6 @@ export const settingsStorage = createExtensionStorage(STORAGE_KEYS.SETTINGS, {
   version: '0.0.1',
   mode: 'ichigoichie' as const,
   romaji: false,
-  levels: [1, 2, 3, 4, 5].map(level => ({ level: level as 1 | 2 | 3 | 4 | 5, enabled: true }))
+  levels: [1, 2, 3, 4, 5].map(level => ({ level: level as 1 | 2 | 3 | 4 | 5, enabled: true })),
+  theme: 'light' as const
 })

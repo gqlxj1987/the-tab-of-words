@@ -1,7 +1,7 @@
 import { atom } from 'jotai'
 import { focusAtom } from 'jotai-optics'
 import { atomWithStorage } from 'jotai/utils'
-import { Levels, Level, Id, Settings, View, Word } from '../types'
+import { Levels, Level, Id, Settings, View, Word, Theme } from '../types'
 import { learnedStorage, metStorage, settingsStorage } from '../utils/extension-storage-provider'
 
 const KEY = `tab-of-words`
@@ -16,6 +16,7 @@ const DEFAULT_SETTINGS: Settings = {
   mode: 'ichigoichie',
   romaji: false,
   levels: DEFAULT_LEVELS,
+  theme: 'light',
 }
 
 export const wordsAtom = atom<Word[]>([])
@@ -37,6 +38,9 @@ export const levelsAtom = focusAtom(settingsAtom, (optic) =>
 )
 export const romajiAtom = focusAtom(settingsAtom, (optic) =>
   optic.prop('romaji')
+)
+export const themeAtom = focusAtom(settingsAtom, (optic) =>
+  optic.prop('theme').optional()
 )
 
 export const viewAtom = atom<View>('word')

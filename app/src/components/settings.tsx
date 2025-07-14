@@ -7,8 +7,9 @@ import {
   modeAtom,
   romajiAtom,
   switchLevelAtom,
+  themeAtom,
 } from '../context/store'
-import { Level, Mode } from '../types'
+import { Level, Mode, Theme } from '../types'
 import Checkbox from './checkbox'
 import Container from './container'
 import FormControl from './form-control'
@@ -65,7 +66,7 @@ function ModeSwitcher() {
         label={
           <>
             <span>Ichigo Ichie</span>
-            <div className="col-start-2 flex justify-between text-stone-500">
+            <div className="col-start-2 flex justify-between text-stone-500 dark:text-stone-400">
               <span>
                 Words only appear once. (
                 <ruby>
@@ -83,7 +84,7 @@ function ModeSwitcher() {
               </span>
               {mode === 'ichigoichie' && (
                 <button
-                  className="text-stone-500 underline"
+                  className="text-stone-500 underline dark:text-stone-400"
                   onClick={handleReset}
                 >
                   Reset
@@ -104,7 +105,7 @@ function ModeSwitcher() {
         label={
           <>
             <div>Random</div>
-            <div className="col-start-2 text-stone-500">
+            <div className="col-start-2 text-stone-500 dark:text-stone-400">
               Words appear randomly, except for the learned words.
             </div>
           </>
@@ -139,7 +140,7 @@ function Levels() {
           />
         ))}
       </div>
-      <div className="col-start-2 text-stone-500">
+      <div className="col-start-2 text-stone-500 dark:text-stone-400">
         Only words of selected levels appear.
       </div>
     </FormSection>
@@ -148,12 +149,41 @@ function Levels() {
 
 function Options() {
   const [romaji, setRomaji] = useAtom(romajiAtom)
+  const [theme, setTheme] = useAtom(themeAtom)
+
+  const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setTheme(e.target.value as Theme)
+    }
+  }
+
+  const currentTheme = theme || 'light'
 
   return (
     <FormSection title="Options">
       <FormControl label="Romaji">
         <Checkbox checked={romaji} onChange={setRomaji} />
       </FormControl>
+      
+      <div className="mt-6">
+        <div className="mb-4 text-lg font-medium">Theme</div>
+        <FormControl label="Light">
+          <Radio
+            name="theme"
+            value="light"
+            target={currentTheme}
+            onChange={handleThemeChange}
+          />
+        </FormControl>
+        <FormControl label="Dark">
+          <Radio
+            name="theme"
+            value="dark"
+            target={currentTheme}
+            onChange={handleThemeChange}
+          />
+        </FormControl>
+      </div>
     </FormSection>
   )
 }
@@ -161,16 +191,15 @@ function Options() {
 function Info() {
   const links = [
     // ['Product Page', ''],
-    ['Source Code', 'https://github.com/wkei/the-tab-of-words/tree/main'],
+    ['Source Code', 'https://github.com/gqlxj1987/the-tab-of-words/tree/main'],
     [
       'Data Source',
       'https://github.com/wkei/jlpt-vocab-api/tree/main/data-source',
     ],
-    ['Author', 'https://keibungen.com/'],
   ]
   return (
     <FormSection title="About">
-      <ul className="list-disc text-stone-200">
+      <ul className="list-disc text-stone-200 dark:text-stone-600">
         {links.map(([label, href]) => (
           <li className="mb-1 last:mb-0" key={href}>
             <a className="link" href={href}>
