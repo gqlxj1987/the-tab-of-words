@@ -26,8 +26,8 @@ export default function IconButton({
     <Comp
       {...linkProps}
       className={`
-        ${active ? 'text-stone-800' : 'text-stone-400'}
-        cursor-pointer  transition-colors hover:text-stone-800
+        ${active ? 'text-stone-800 dark:text-stone-200' : 'text-stone-400 dark:text-stone-500'}
+        cursor-pointer transition-colors hover:text-stone-800 dark:hover:text-stone-200
       `}
       onClick={() => onClick && onClick()}
     >

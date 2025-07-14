@@ -17,7 +17,7 @@ export default function LevelBadge({ level, size }: LevelBadgeProps) {
 
   return (
     <div
-      className={`${classnames} select-none rounded-[3px] bg-stone-600 text-center font-medium leading-none text-white`}
+      className={`${classnames} select-none rounded-[3px] bg-stone-600 text-center font-medium leading-none text-white dark:bg-stone-300 dark:text-stone-900`}
     >
       N{level}
     </div>

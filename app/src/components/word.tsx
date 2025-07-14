@@ -65,7 +65,7 @@ export default function Word() {
   if (!randomWord)
     return (
       <>
-        <code className="text-base text-stone-400">
+        <code className="text-base text-stone-400 dark:text-stone-500">
           :)
           <br />
           You met all the words
@@ -79,7 +79,7 @@ export default function Word() {
     <div className="absolute left-1/2 top-1/2 w-[80vw] translate-x-[-50%] translate-y-[-60%] text-center text-base md:text-xl">
       {isLoading && (
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full">
-          <code className="text-stone-400">Loading...</code>
+          <code className="text-stone-400 dark:text-stone-500">Loading...</code>
         </div>
       )}
       <Furigana word={randomWord} />

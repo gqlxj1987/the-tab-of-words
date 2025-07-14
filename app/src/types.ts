@@ -16,9 +16,12 @@ export type Mode = 'ichigoichie' | 'random'
 
 export type Levels = Array<{ level: Level; enabled: boolean }>
 
+export type Theme = 'light' | 'dark'
+
 export type Settings = {
   version: string
   mode: Mode
   levels: Levels
   romaji: boolean
+  theme: Theme
 }
