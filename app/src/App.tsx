@@ -42,18 +42,22 @@ function App() {
   useEffect(() => {
     const initializeStorage = async () => {
       try {
+        console.log('[App] Starting storage initialization')
         // Migrate from localStorage to chrome.storage if needed
         await migrateFromLocalStorage()
         
         // Pre-load storage data to avoid async issues
-        const [, , settings] = await Promise.all([
+        const [learned, met, settings] = await Promise.all([
           ExtensionStorage.get(STORAGE_KEYS.LEARNED),
           ExtensionStorage.get(STORAGE_KEYS.MET),
           ExtensionStorage.get(STORAGE_KEYS.SETTINGS)
         ])
         
+        console.log('[App] Storage data loaded:', { learned, met, settings })
+        
         // Apply theme immediately if found in storage
         if (settings?.theme) {
+          console.log('[App] Applying theme from storage:', settings.theme)
           if (settings.theme === 'dark') {
             document.documentElement.classList.add('dark')
           } else {

@@ -150,6 +150,13 @@ function Levels() {
 function Options() {
   const [romaji, setRomaji] = useAtom(romajiAtom)
   const [theme, setTheme] = useAtom(themeAtom)
+  
+  console.log(`[Settings] Current romaji value: ${romaji}`)
+
+  const handleRomajiChange = (checked: boolean) => {
+    console.log(`[Settings] Changing romaji from ${romaji} to ${checked}`)
+    setRomaji(checked)
+  }
 
   const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -162,7 +169,7 @@ function Options() {
   return (
     <FormSection title="Options">
       <FormControl label="Romaji">
-        <Checkbox checked={romaji} onChange={setRomaji} />
+        <Checkbox checked={romaji} onChange={handleRomajiChange} />
       </FormControl>
       
       <div className="mt-6">

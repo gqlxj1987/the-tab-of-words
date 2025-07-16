@@ -7,9 +7,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const status = document.getElementById('status')
 
   // Load current settings
-  chrome.storage.local.get(['settings'], function(result) {
-    if (result.settings) {
-      const settings = result.settings
+  chrome.storage.local.get(['tab-of-words-settings'], function(result) {
+    console.log('[Popup] Loading settings:', result)
+    if (result['tab-of-words-settings']) {
+      const settings = result['tab-of-words-settings']
+      console.log('[Popup] Settings loaded:', settings)
       romajiToggle.checked = settings.romaji || false
       
       // Create level checkboxes
@@ -64,10 +66,18 @@ document.addEventListener('DOMContentLoaded', function() {
   })
 
   romajiToggle.addEventListener('change', function() {
-    chrome.storage.local.get(['settings'], function(result) {
-      const settings = result.settings || {}
+    chrome.storage.local.get(['tab-of-words-settings'], function(result) {
+      const settings = result['tab-of-words-settings'] || {
+        version: '0.0.1',
+        mode: 'ichigoichie',
+        romaji: false,
+        levels: [1, 2, 3, 4, 5].map(level => ({ level, enabled: true })),
+        theme: 'light'
+      }
       settings.romaji = romajiToggle.checked
-      chrome.storage.local.set({ settings }, function() {
+      console.log('[Popup] Saving romaji setting:', settings.romaji)
+      chrome.storage.local.set({ 'tab-of-words-settings': settings }, function() {
+        console.log('[Popup] Settings saved successfully')
         status.textContent = 'Settings saved'
         setTimeout(() => {
           status.textContent = 'Extension ready'
@@ -77,8 +87,14 @@ document.addEventListener('DOMContentLoaded', function() {
   })
 
   function updateLevelSetting(level, enabled) {
-    chrome.storage.local.get(['settings'], function(result) {
-      const settings = result.settings || {}
+    chrome.storage.local.get(['tab-of-words-settings'], function(result) {
+      const settings = result['tab-of-words-settings'] || {
+        version: '0.0.1',
+        mode: 'ichigoichie',
+        romaji: false,
+        levels: [1, 2, 3, 4, 5].map(l => ({ level: l, enabled: true })),
+        theme: 'light'
+      }
       if (!settings.levels) {
         settings.levels = [
           { level: 1, enabled: true },
@@ -94,7 +110,8 @@ document.addEventListener('DOMContentLoaded', function() {
         settings.levels[levelIndex].enabled = enabled
       }
       
-      chrome.storage.local.set({ settings }, function() {
+      chrome.storage.local.set({ 'tab-of-words-settings': settings }, function() {
+        console.log('[Popup] Level settings updated')
         status.textContent = 'Level settings updated'
         setTimeout(() => {
           status.textContent = 'Extension ready'

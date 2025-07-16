@@ -10,6 +10,7 @@ export class ExtensionStorage {
   static async get(key: string): Promise<any> {
     if (!isExtensionContext) {
       // Fallback to memory storage in development
+      console.log(`[ExtensionStorage] Fallback get for ${key}:`, fallbackStorage[key])
       return Promise.resolve(fallbackStorage[key])
     }
 
@@ -20,6 +21,7 @@ export class ExtensionStorage {
             console.warn(`Storage get error for ${key}:`, chrome.runtime.lastError)
             resolve(undefined)
           } else {
+            console.log(`[ExtensionStorage] Retrieved ${key}:`, result[key])
             resolve(result[key])
           }
         })
@@ -33,15 +35,19 @@ export class ExtensionStorage {
   static async set(key: string, value: any): Promise<void> {
     if (!isExtensionContext) {
       // Fallback to memory storage in development
+      console.log(`[ExtensionStorage] Fallback set for ${key}:`, value)
       fallbackStorage[key] = value
       return Promise.resolve()
     }
 
     return new Promise((resolve, reject) => {
       try {
+        console.log(`[ExtensionStorage] Setting ${key}:`, value)
         chrome.storage.local.set({ [key]: value }, () => {
           if (chrome.runtime.lastError) {
             console.warn(`Storage set error for ${key}:`, chrome.runtime.lastError)
+          } else {
+            console.log(`[ExtensionStorage] Successfully set ${key}`)
           }
           resolve()
         })

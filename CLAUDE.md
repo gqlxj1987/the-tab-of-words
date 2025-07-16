@@ -51,6 +51,12 @@ This is a Japanese vocabulary learning Chrome extension (formerly PWA) built wit
 - Uses `jotai-optics` for focused atom updates
 - Persistent storage with custom storage providers for extension compatibility
 
+**Storage Keys**:
+- All storage keys are prefixed with `tab-of-words-` to avoid conflicts
+- Settings stored under `tab-of-words-settings` key
+- Learned words stored under `tab-of-words-learned` key
+- Met words stored under `tab-of-words-met` key
+
 **Component Structure**:
 - Three main views: Word (`word`), Book (`book`), Settings (`settings`)
 - View switching handled by `viewAtom` state
@@ -119,6 +125,7 @@ The extension implements a spaced repetition-like system:
 - Font: Uses serif font for Japanese text display
 - Responsive design with mobile-first approach
 - Color scheme: Stone/neutral tones
+- Dark mode support with persistent theme storage
 
 ### API Integration
 
@@ -133,3 +140,33 @@ Required permissions in manifest:
 - `storage` - for chrome.storage.local API
 - Host permissions for external APIs (vocab API, pronunciation, dictionary)
 - `chrome_url_overrides` for new tab page replacement
+
+### Known Issues and Debugging
+
+**Romaji Option Persistence**:
+- The romaji toggle setting is stored in `tab-of-words-settings` in chrome.storage.local
+- Both the popup.js and main app must use the same storage key
+- Storage is initialized asynchronously, so there may be a brief delay before settings are loaded
+- Debug logging is available to track storage operations and state changes
+
+**Debugging Storage Issues**:
+1. Open Chrome DevTools console
+2. Look for logs prefixed with:
+   - `[Storage]` - Storage provider operations
+   - `[ExtensionStorage]` - Chrome storage API calls
+   - `[App]` - App initialization and storage loading
+   - `[Settings]` - Settings component state
+   - `[Furigana]` - Romaji display logic
+   - `[Popup]` - Extension popup operations
+
+**Common Storage Debugging Commands**:
+```javascript
+// Check all storage contents
+chrome.storage.local.get(null, (result) => console.log(result))
+
+// Check specific setting
+chrome.storage.local.get(['tab-of-words-settings'], (result) => console.log(result))
+
+// Clear all storage (use with caution)
+chrome.storage.local.clear()
+```

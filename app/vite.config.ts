@@ -16,6 +16,18 @@ export default defineConfig({
         entryFileNames: (chunkInfo) => {
           return chunkInfo.name === 'sw' ? 'sw.js' : 'assets/[name]-[hash].js'
         }
+      },
+      external: ['popup.js'],
+      onwarn(warning, warn) {
+        // Suppress 'use client' directive warnings from dependencies
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+          return
+        }
+        // Suppress popup.js bundling warning since it's handled separately
+        if (warning.message && warning.message.includes('popup.js')) {
+          return
+        }
+        warn(warning)
       }
     }
   },
