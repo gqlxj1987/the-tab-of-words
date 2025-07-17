@@ -10,23 +10,19 @@ export class ExtensionStorage {
   static async get(key: string): Promise<any> {
     if (!isExtensionContext) {
       // Fallback to memory storage in development
-      console.log(`[ExtensionStorage] Fallback get for ${key}:`, fallbackStorage[key])
       return Promise.resolve(fallbackStorage[key])
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
         chrome.storage.local.get([key], (result) => {
           if (chrome.runtime.lastError) {
-            console.warn(`Storage get error for ${key}:`, chrome.runtime.lastError)
             resolve(undefined)
           } else {
-            console.log(`[ExtensionStorage] Retrieved ${key}:`, result[key])
             resolve(result[key])
           }
         })
-      } catch (error) {
-        console.warn(`Storage get exception for ${key}:`, error)
+      } catch {
         resolve(undefined)
       }
     })
@@ -35,24 +31,16 @@ export class ExtensionStorage {
   static async set(key: string, value: any): Promise<void> {
     if (!isExtensionContext) {
       // Fallback to memory storage in development
-      console.log(`[ExtensionStorage] Fallback set for ${key}:`, value)
       fallbackStorage[key] = value
       return Promise.resolve()
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
-        console.log(`[ExtensionStorage] Setting ${key}:`, value)
         chrome.storage.local.set({ [key]: value }, () => {
-          if (chrome.runtime.lastError) {
-            console.warn(`Storage set error for ${key}:`, chrome.runtime.lastError)
-          } else {
-            console.log(`[ExtensionStorage] Successfully set ${key}`)
-          }
           resolve()
         })
-      } catch (error) {
-        console.warn(`Storage set exception for ${key}:`, error)
+      } catch {
         resolve()
       }
     })
@@ -65,16 +53,12 @@ export class ExtensionStorage {
       return Promise.resolve()
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
         chrome.storage.local.remove([key], () => {
-          if (chrome.runtime.lastError) {
-            console.warn(`Storage remove error for ${key}:`, chrome.runtime.lastError)
-          }
           resolve()
         })
-      } catch (error) {
-        console.warn(`Storage remove exception for ${key}:`, error)
+      } catch {
         resolve()
       }
     })

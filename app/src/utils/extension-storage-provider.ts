@@ -5,28 +5,22 @@ import { ExtensionStorage, STORAGE_KEYS } from './extension-storage'
 
 // Create a synchronous-style storage adapter for better jotai compatibility
 export function createExtensionStorage<T>(storageKey: string, defaultValue: T) {
-  console.log(`[Storage] Creating storage for ${storageKey} with default:`, defaultValue)
   let cachedValue: T = defaultValue
   let isInitialized = false
   let initPromise: Promise<void> | null = null
+  let listeners: Array<() => void> = []
 
   // Initialize cache from storage
   const initCache = async () => {
     if (!isInitialized && !initPromise) {
-      console.log(`[Storage] Starting initialization for ${storageKey}`)
       initPromise = (async () => {
         try {
           const value = await ExtensionStorage.get(storageKey)
-          console.log(`[Storage] Retrieved value for ${storageKey}:`, value)
           if (value !== undefined) {
             cachedValue = value
-            console.log(`[Storage] Updated cache for ${storageKey}:`, cachedValue)
-          } else {
-            console.log(`[Storage] No stored value for ${storageKey}, using default`)
           }
           isInitialized = true
         } catch (error) {
-          console.warn(`Failed to initialize cache for ${storageKey}:`, error)
           isInitialized = true
         }
       })()
@@ -34,36 +28,61 @@ export function createExtensionStorage<T>(storageKey: string, defaultValue: T) {
     }
   }
 
+  // Listen for external storage changes (e.g., from popup)
+  const setupStorageListener = () => {
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener((changes, namespace) => {
+        if (namespace === 'local' && changes[storageKey]) {
+          const newValue = changes[storageKey].newValue
+          if (JSON.stringify(newValue) !== JSON.stringify(cachedValue)) {
+            cachedValue = newValue !== undefined ? newValue : defaultValue
+            // Notify any listeners (like Jotai's storage implementation)
+            listeners.forEach(listener => listener())
+          }
+        }
+      })
+    }
+  }
+
+  // Set up storage listener
+  setupStorageListener()
+
   // Pre-initialize all storage keys to ensure they're ready when accessed
   initCache()
 
   return {
     getItem: (key: string): T | null => {
-      console.log(`[Storage] getItem called for ${storageKey}, initialized: ${isInitialized}, cachedValue:`, cachedValue)
       // Initialize cache if not done yet
       if (!isInitialized) {
-        console.log(`[Storage] Not initialized yet, triggering init for ${storageKey}`)
         initCache()
       }
       return cachedValue
     },
     setItem: (key: string, value: T): void => {
-      console.log(`[Storage] setItem called for ${storageKey} with value:`, value)
       cachedValue = value
       isInitialized = true
       // Async save to storage (fire and forget)
-      ExtensionStorage.set(storageKey, value)
-        .then(() => console.log(`[Storage] Successfully saved ${storageKey}`))
-        .catch(error => {
-          console.warn(`Failed to save ${storageKey} to storage:`, error)
-        })
+      ExtensionStorage.set(storageKey, value).catch(() => {
+        // Silently handle storage errors
+      })
     },
     removeItem: (key: string): void => {
       cachedValue = defaultValue
+      isInitialized = true
       // Async remove from storage (fire and forget)
-      ExtensionStorage.remove(storageKey).catch(error => {
-        console.warn(`Failed to remove ${storageKey} from storage:`, error)
+      ExtensionStorage.remove(storageKey).catch(() => {
+        // Silently handle storage errors
       })
+    },
+    // Jotai storage interface support
+    subscribe: (listener: () => void) => {
+      listeners.push(listener)
+      return () => {
+        const index = listeners.indexOf(listener)
+        if (index > -1) {
+          listeners.splice(index, 1)
+        }
+      }
     }
   }
 }

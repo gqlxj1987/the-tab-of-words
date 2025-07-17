@@ -8,44 +8,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Load current settings
   chrome.storage.local.get(['tab-of-words-settings'], function(result) {
-    console.log('[Popup] Loading settings:', result)
-    if (result['tab-of-words-settings']) {
-      const settings = result['tab-of-words-settings']
-      console.log('[Popup] Settings loaded:', settings)
-      romajiToggle.checked = settings.romaji || false
-      
-      // Create level checkboxes
-      const levels = settings.levels || [
+    const settings = result['tab-of-words-settings'] || {
+      version: '0.0.1',
+      mode: 'ichigoichie',
+      romaji: false,
+      levels: [
         { level: 1, enabled: true },
         { level: 2, enabled: true },
         { level: 3, enabled: true },
         { level: 4, enabled: true },
         { level: 5, enabled: true }
-      ]
-      
-      levels.forEach(levelObj => {
-        const div = document.createElement('div')
-        div.className = 'checkbox-item'
-        
-        const checkbox = document.createElement('input')
-        checkbox.type = 'checkbox'
-        checkbox.id = `level${levelObj.level}`
-        checkbox.checked = levelObj.enabled
-        
-        const label = document.createElement('label')
-        label.htmlFor = `level${levelObj.level}`
-        label.textContent = `JLPT N${levelObj.level}`
-        
-        div.appendChild(checkbox)
-        div.appendChild(label)
-        levelCheckboxes.appendChild(div)
-        
-        // Add event listener for level changes
-        checkbox.addEventListener('change', function() {
-          updateLevelSetting(levelObj.level, checkbox.checked)
-        })
-      })
+      ],
+      theme: 'light'
     }
+    
+    romajiToggle.checked = settings.romaji
+    
+    // Create level checkboxes
+    const levels = settings.levels || [
+      { level: 1, enabled: true },
+      { level: 2, enabled: true },
+      { level: 3, enabled: true },
+      { level: 4, enabled: true },
+      { level: 5, enabled: true }
+    ]
+    
+    levels.forEach(levelObj => {
+      const div = document.createElement('div')
+      div.className = 'checkbox-item'
+      
+      const checkbox = document.createElement('input')
+      checkbox.type = 'checkbox'
+      checkbox.id = `level${levelObj.level}`
+      checkbox.checked = levelObj.enabled
+      
+      const label = document.createElement('label')
+      label.htmlFor = `level${levelObj.level}`
+      label.textContent = `JLPT N${levelObj.level}`
+      
+      div.appendChild(checkbox)
+      div.appendChild(label)
+      levelCheckboxes.appendChild(div)
+      
+      // Add event listener for level changes
+      checkbox.addEventListener('change', function() {
+        updateLevelSetting(levelObj.level, checkbox.checked)
+      })
+    })
   })
 
   // Event listeners
@@ -75,9 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
         theme: 'light'
       }
       settings.romaji = romajiToggle.checked
-      console.log('[Popup] Saving romaji setting:', settings.romaji)
       chrome.storage.local.set({ 'tab-of-words-settings': settings }, function() {
-        console.log('[Popup] Settings saved successfully')
         status.textContent = 'Settings saved'
         setTimeout(() => {
           status.textContent = 'Extension ready'
@@ -111,7 +118,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       chrome.storage.local.set({ 'tab-of-words-settings': settings }, function() {
-        console.log('[Popup] Level settings updated')
         status.textContent = 'Level settings updated'
         setTimeout(() => {
           status.textContent = 'Extension ready'

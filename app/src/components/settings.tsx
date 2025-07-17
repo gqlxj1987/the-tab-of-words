@@ -151,10 +151,7 @@ function Options() {
   const [romaji, setRomaji] = useAtom(romajiAtom)
   const [theme, setTheme] = useAtom(themeAtom)
   
-  console.log(`[Settings] Current romaji value: ${romaji}`)
-
   const handleRomajiChange = (checked: boolean) => {
-    console.log(`[Settings] Changing romaji from ${romaji} to ${checked}`)
     setRomaji(checked)
   }
 
