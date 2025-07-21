@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const settings = result['tab-of-words-settings'] || {
       version: '0.0.1',
       mode: 'ichigoichie',
-      romaji: false,
+      romaji: true,
       levels: [
         { level: 1, enabled: true },
         { level: 2, enabled: true },
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const settings = result['tab-of-words-settings'] || {
         version: '0.0.1',
         mode: 'ichigoichie',
-        romaji: false,
+        romaji: true,
         levels: [1, 2, 3, 4, 5].map(level => ({ level, enabled: true })),
         theme: 'light'
       }
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const settings = result['tab-of-words-settings'] || {
         version: '0.0.1',
         mode: 'ichigoichie',
-        romaji: false,
+        romaji: true,
         levels: [1, 2, 3, 4, 5].map(l => ({ level: l, enabled: true })),
         theme: 'light'
       }

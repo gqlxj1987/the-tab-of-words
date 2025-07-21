@@ -93,7 +93,7 @@ export const metStorage = createExtensionStorage(STORAGE_KEYS.MET, [])
 export const settingsStorage = createExtensionStorage(STORAGE_KEYS.SETTINGS, {
   version: '0.0.1',
   mode: 'ichigoichie' as const,
-  romaji: false,
+  romaji: true,
   levels: [1, 2, 3, 4, 5].map(level => ({ level: level as 1 | 2 | 3 | 4 | 5, enabled: true })),
   theme: 'light' as const
 })

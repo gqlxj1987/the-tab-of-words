@@ -14,7 +14,7 @@ export const DEFAULT_LEVELS: Levels = ([1, 2, 3, 4, 5] as Level[]).reduce(
 const DEFAULT_SETTINGS: Settings = {
   version: '0.0.1',
   mode: 'ichigoichie',
-  romaji: false,
+  romaji: true,
   levels: DEFAULT_LEVELS,
   theme: 'light',
 }
